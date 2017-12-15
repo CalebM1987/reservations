@@ -1,0 +1,46 @@
+/*@import "~bootstrap/dist/css/bootstrap.css";*/
+@import "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css";
+
+body{
+  padding-top: 50px;
+}
+h4{
+  padding-left: 5px;
+}
+
+.left{
+  float: left;
+  padding-left: 5px;
+}
+.right{
+  float: right;
+  padding-right: 5px;
+}
+
+.glyphicon{
+  cursor: pointer;
+}
+.input-group{
+  margin-top: 10px;
+}
+.half{
+  width: 50%;
+}
+.top{
+  margin-top: 10px;
+}
+.auto-width{
+  width: auto;
+}
+.same-line{
+  display: inline-flex;
+  justify-content: space-between;
+}
+
+.hidden {
+  display: none;
+}
+
+.block-title{
+  font-size: 1.75em;
+}
