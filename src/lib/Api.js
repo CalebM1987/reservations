@@ -23,10 +23,19 @@ export default{
     });
   },
 
+  maintenance_between: function(from, to){
+    return axios.get(this.API_BASE + '/maintenance', {
+      params: {
+        from: typeof from === 'object' ? this.format_date(from): from,
+        to: typeof to === 'object' ? this.format_date(to): to
+      }
+    });
+  },
+
   add_or_update_reservation: function(res){
     if (res.res_id){
       // update
-      return axios.post(`this.API_BASE/reservations/update/${res.res_id}`, res);
+      return axios.post(`${this.API_BASE}/reservations/update/${res.res_id}`, res);
     } else {
       // add new
       return axios.post(this.API_BASE + '/reservations/add', res);
@@ -39,6 +48,24 @@ export default{
       url += `/${id}` + (reservations ? '/reservations': '');
     }
     return axios.get(url);
+  },
+
+  maintenance: function(id=null, params){
+    let url = this.API_BASE + '/maintenance';
+    if (id){
+      url += `/${id}`;
+    }
+    return axios.get(url, {
+      params: params
+    });
+  },
+
+  applyEdits: function(endpoint, adds=[], updates=[], deletes=[]){
+    return axios.post(`${this.API_BASE}/${endpoint}/applyEdits`, {
+      adds: adds,
+      updates: updates,
+      deletes: deletes
+    });
   }
 
 }

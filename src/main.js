@@ -45,9 +45,7 @@ function init(json){
     render: h => h(App),
     data: json,
     mounted: function(){
-      EventBus.$on('date-range-changed', ()=>{
-        this.updateDateRange();
-      });
+      EventBus.$on('date-range-changed', this.updateDateRange);
       EventBus.$on('reservation-change', ()=>{
         // clear template
         this.current_reservation = Object.assign({}, Data.reservation_template);

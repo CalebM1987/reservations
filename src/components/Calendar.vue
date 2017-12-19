@@ -56,7 +56,7 @@
         return arr;
       },
       isToday: function(day){
-        return day.format().split("T")[0] == moment().format().split("T")[0];
+        return day.format().split("T")[0] === moment().format().split("T")[0];
       },
 
 //      dateRange: this.$parent.dateRange,
@@ -97,7 +97,7 @@
         this.activeRange.forEach((mom, i) => {
           let m = moment(`${mom.format('YYYY-MM-DD')} 00:00:00`); // do not touch this!
           if (m.isSameOrAfter(din) && m.isSameOrBefore(dout)){
-            console.log('set cells moment: ', m);
+//            console.log('set cells moment: ', m);
             date_indices.push(i);
           }
         });
@@ -115,16 +115,17 @@
       },
 
       showReservations: function(from=this.activeRange[0], to=this.activeRange[this.activeRange.length-1]){
-        // remove all existing reservations
+        // remove all existing reservations and maintenance
         $('.reservation').empty();
+        $('.maintenance').empty();
 
-        // fetch reservations in current date range
+        // fetch reservations and maintenance in current date range
         Api.reservations_between(from, to, true).then(results =>{
           console.log('reservations in current range: ', this.activeRange[0].format('YYYY-MM-DD'), this.activeRange[4].format('YYYY-MM-DD'), results.data);
 
           // iterate through results and add to calendar
           results.data.forEach(res => {
-            console.log('res: ', res)
+//            console.log('res: ', res)
 
             // get date in and out
             let din = new moment(res.date_in);
@@ -143,6 +144,26 @@
         });
 
         // TODO: fill in maintenance records
+        Api.maintenance_between(from, to).then((mResults)=> {
+          mResults.data.forEach((mnt) => {
+
+            // get date in and out
+            let din = new moment(mnt.date_start);
+            let dout = new moment(mnt.date_end);
+            let maint = $('<div/>', {
+              class: 'maintenance',
+              html: `<p>${mnt.maint_description}</p>`,
+              css: {
+                'background-color': 'red',
+                height: '100%',
+                padding: '15px'
+              }
+            });
+
+            this.setCalendarCells(din, dout, mnt.maint_room_ids, maint);
+
+          });
+        });
       },
 
     },
