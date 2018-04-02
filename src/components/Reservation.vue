@@ -1,5 +1,5 @@
 <template>
-  <div class="modal fade" id="reservation" :class="'reservation-modal-' + _uid" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+  <div id="reservation" :class="'modal fade reservation-modal-' + _uid" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -89,6 +89,7 @@
       }
     },
     mounted: function(){
+      console.log('mounted Reservation: ', this);
       $(this.$refs.check_in).datepicker({
         autoclose: true,
         format: 'mm-dd-yyyy',
@@ -121,6 +122,20 @@
                   })
                 });
               });
+
+              // also remove maintenance
+              Api.maintenance_between(check_in, check_out).then((response)=>{
+                response.data.forEach((maint)=>{
+                  maint.maint_room_ids.split(',').forEach((r)=>{
+                    $(`#room-${r}.room-${this._uid}`).addClass('hidden');
+                  });
+                });
+              });
+
+              // make sure there are still rooms available at this time
+              if ($(`.room-${this._uid}:not(.hidden)`).length === 0){
+                swal('Error', 'There are no rooms available for this selected range', 'error');
+              }
 
               // hide datepicker
               $(e.target).datepicker('hide');
@@ -180,6 +195,7 @@
         Api.add_or_update_reservation(this.reservation).then(results =>{
           console.log('submitReservation Response: ', results.data);
           EventBus.$emit('reservation-change');
+          swal('Success', `Created Reservation #${results.data.res_id}`, 'success');
         });
       },
       formatPhoneNumber: function(e) {
@@ -263,7 +279,6 @@
               this.state = csz.state;
               this.stateLabel = this.stateLookup[csz.state].name;
               this.zip = csz.zip;
-              //this.reservation.comments = guest.guest_comments;
               return item;
             },
             matcher: function (item) {
@@ -291,7 +306,7 @@
 
     watch: {
       cityStZip(){
-        // set reservation csz
+        // set reservation city state zip
         this.reservation.csz = this.formatCSZ();
       },
 
@@ -301,9 +316,12 @@
     },
 
     filters: {
-      phoneNumber: this.formatPhoneNumber,
+      phoneNumber(val){
+        return this.formatPhoneNumber(val);
+      }
     }
   }
+
 
 </script>
 

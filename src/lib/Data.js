@@ -7,11 +7,23 @@ const Data = {
     "room_ids": "",
     "status": null,
     "address": null,
-    "guest_comments": null,
     "csz": null,
     "email": null,
     "name": null,
-    "phone_number": null
+    "phone_number": null,
+    "chard_ids": null
+  },
+  charge_template: {
+    charge_description: null,
+    amount: null
+  },
+  maintenance_template: {
+    date_start: null,
+    date_end: null,
+    maint_description: null,
+    maint_comments: null,
+    estimated_cost: null,
+    maint_room_ids: ''
   },
   states: [
     {

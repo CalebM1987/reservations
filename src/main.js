@@ -1,4 +1,4 @@
-import $ from 'jquery'; // not necessary?
+// import $ from 'jquery'; // not necessary?
 // import 'bootstrap';
 // require('bootstrap-webpack');
 // require('bootstrap-datepicker');
@@ -9,35 +9,19 @@ import Api from './lib/Api';
 import Calendar from './components/Calendar.vue';
 import Reservation from './components/Reservation.vue';
 import Admin from './components/Admin.vue';
+import Tools from './components/Tools.vue';
 import {EventBus} from './lib/EventBus';
 import Data from './lib/Data';
+import utils from './lib/utils';
 
 window.moment = moment;
 
 // css
 // require('style-loader!css-loader!./css/style.css');
-//require("style-loader!css-loader!bootstrap/dist/css/bootstrap.css");
-// import 'bootstrap/dist/css/bootstrap.css';
-console.log('moment from holidays.js is: ', moment);
-// test
-function dateRange(mom, days){
-  if (!mom){
-    let d = new Date();
-    mom = moment(`${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()} 00:00:00`);
-  }
-  if (!days){
-    days = 5;
-  }
-  var arr = [];
-  for (var i=1; i <= days; ++i){
-    arr.push(mom.clone().add(i, 'd'));
-  }
-  return arr;
-}
-
 Vue.component('calendar', Calendar);
 Vue.component('reservation', Reservation);
 Vue.component('admin', Admin);
+Vue.component('tools', Tools);
 
 function init(json){
   let vue = new Vue({
@@ -45,6 +29,15 @@ function init(json){
     render: h => h(App),
     data: json,
     mounted: function(){
+      // allow navigation from calendar button
+      $('#date-navigator').datepicker({
+        autoclose: true
+      }).on('changeDate', (e)=>{
+        console.log('changed navigator', this, e.date)
+        this.updateDateRange(utils.dateRange(new moment(e.date).subtract(1, 'd'), 5));
+        $(e.target).datepicker('hide');
+      });
+
       EventBus.$on('date-range-changed', this.updateDateRange);
       EventBus.$on('reservation-change', ()=>{
         // clear template
@@ -52,7 +45,6 @@ function init(json){
       });
     },
     methods: {
-      dateRange: dateRange,
       updateDateRange: function(range){
         this.activeRange = range;
       },
@@ -99,7 +91,7 @@ Api.getRooms().then(function(resp){
 
   let json = {
     clickedNewRes: false,
-    activeRange: dateRange(moment().subtract(2,'d'), 5),
+    activeRange: utils.dateRange(moment().subtract(2,'d'), 5),
     rooms: rooms,
     roomTypes: roomTypes,
     current_reservation: Object.assign({}, Data.reservation_template),

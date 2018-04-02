@@ -1,15 +1,24 @@
 <template>
-  <table class="table table-striped editable">
+  <table class="table table-striped table-bordered editable">
     <thead class="editable">
     <tr class="header-row editable">
       <th class="editable" v-for="(field, index) in fields">{{ field | titleCase }}
-        <span class="glyphicon glyphicon-plus-sign add-new pull-right" v-if="index === (fields.length-1)" @click="additem"></span>
+        <span class="glyphicon glyphicon-plus-sign add-new pull-right" v-if="index === (fields.length-1)" @click="additem" title="add new item"></span>
       </th>
     </tr>
     </thead>
 
     <tbody class="editable">
-    <row v-for="item in items" :data="item" :fields="fields" :allow_delete="true" :allow_edit="true" key="item[item_key]" @on-delete="onDelete" @on-change="onChange"></row>
+    <row v-for="item in items"
+         :data="item"
+         :fields="fields"
+         :allow_delete="true"
+         :allow_edit="true"
+         :action_btn_class="action_btn_class"
+         :action_btn_help="action_btn_help"
+         key="item[item_key]"
+         @on-delete="onDelete"
+         @on-change="onChange"></row>
     </tbody>
   </table>
 
@@ -17,6 +26,7 @@
 
 <script>
   import Row from './Row.vue';
+  import utils from '../lib/utils';
 
   export default {
     data: function(){
@@ -24,7 +34,7 @@
 
       }
     },
-    props: ['fields', 'items', 'item_key'],
+    props: ['fields', 'items', 'item_key', 'action_btn_class', 'action_btn_help'],
     components: {
       row: Row
     },
@@ -48,11 +58,7 @@
     },
 
     filters: {
-      titleCase: function(str) {
-        return str.toLowerCase().split('_').map(function(word) {
-          return word.replace(word[0], word[0].toUpperCase());
-        }).join(' ');
-      }
+      titleCase: utils.titleCase
     }
   }
 

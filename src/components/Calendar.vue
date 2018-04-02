@@ -25,6 +25,8 @@
   import moment from '../lib/holidays';
   import Api from '../lib/Api';
   import {EventBus} from '../lib/EventBus';
+  import utils from '../lib/utils';
+
   export default {
 //    data: function(){
 //      return {
@@ -42,19 +44,6 @@
       EventBus.$on('reservation-change', this.showReservations);
     },
     methods: {
-      dateRange: function(mom, days){
-        if (!mom){
-          mom = moment();
-        }
-        if (!days){
-          days = 5;
-        }
-        var arr = [];
-        for (var i=1; i <= days; ++i){
-          arr.push(mom.clone().add(i, 'd'));
-        }
-        return arr;
-      },
       isToday: function(day){
         return day.format().split("T")[0] === moment().format().split("T")[0];
       },
@@ -62,13 +51,13 @@
 //      dateRange: this.$parent.dateRange,
 
       nextRange: function(){
-        let range = this.dateRange(this.activeRange[this.activeRange.length-1], 5);
+        let range = utils.dateRange(this.activeRange[this.activeRange.length-1], 5);
         EventBus.$emit('date-range-changed', range);
         return range;
       },
 
       previousRange: function(){
-        let range = this.dateRange(this.activeRange[0].subtract(6, 'd'), 5);
+        let range = utils.dateRange(this.activeRange[0].subtract(6, 'd'), 5);
         EventBus.$emit('date-range-changed', range);
         return range;
       },
@@ -96,7 +85,8 @@
         let date_indices = [];
         this.activeRange.forEach((mom, i) => {
           let m = moment(`${mom.format('YYYY-MM-DD')} 00:00:00`); // do not touch this!
-          if (m.isSameOrAfter(din) && m.isSameOrBefore(dout)){
+//          if (m.isSameOrAfter(din) && m.isSameOrBefore(dout)){
+          if (m.isSameOrAfter(din) && m.isBefore(dout)){
 //            console.log('set cells moment: ', m);
             date_indices.push(i);
           }
@@ -116,8 +106,8 @@
 
       showReservations: function(from=this.activeRange[0], to=this.activeRange[this.activeRange.length-1]){
         // remove all existing reservations and maintenance
-        $('.reservation').empty();
-        $('.maintenance').empty();
+        $('.reservation').remove();
+        $('.maintenance').remove();
 
         // fetch reservations and maintenance in current date range
         Api.reservations_between(from, to, true).then(results =>{
@@ -128,8 +118,8 @@
 //            console.log('res: ', res)
 
             // get date in and out
-            let din = new moment(res.date_in);
-            let dout = new moment(res.date_out);
+            let din = new moment(res.date_in, 'MM-DD-YYYY');
+            let dout = new moment(res.date_out, 'MM-DD-YYYY');
             let reservation = $('<div/>', {
               class: 'reservation',
               html: `<p>#${res.res_id}</p><p>${res.guest_info.name}</p><p>${res.guest_info.phone_number}</p>`,
@@ -148,11 +138,11 @@
           mResults.data.forEach((mnt) => {
 
             // get date in and out
-            let din = new moment(mnt.date_start);
-            let dout = new moment(mnt.date_end);
+            let din = moment(mnt.date_start, 'MM-DD-YYYY');
+            let dout = moment(mnt.date_end, 'MM-DD-YYYY');
             let maint = $('<div/>', {
               class: 'maintenance',
-              html: `<p>${mnt.maint_description}</p>`,
+              html: `<p>Maintenance</p><p>${mnt.maint_description}</p>`,
               css: {
                 'background-color': 'red',
                 height: '100%',
@@ -182,7 +172,7 @@
         var self = this;
         this.activeRange.forEach(function (day, i) {
           if (self.isToday(day)) {
-            console.log(day, i)
+            console.log(day, i);
             return i;
           }
           return -1;

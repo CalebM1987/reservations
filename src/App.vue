@@ -29,7 +29,7 @@
               <h4 class="block-title">Reservation Schedule
                 <!--@click='clickedNewRes = !clickedNewRes'-->
                 <span class='glyphicon glyphicon-plus-sign right' data-toggle="modal" data-target="#reservation" title='create new reservation'></span>
-                <span id='date-navigator' class='glyphicon glyphicon-calendar right'></span>
+                <span id='date-navigator' class='glyphicon glyphicon-calendar right' title="search for date"></span>
               </h4>
             </div>
             <!-- <div class="panel-body">
@@ -53,7 +53,7 @@
     </div>
 
     <div id="tools" class="hidden top-space">
-
+      <tools></tools>
     </div>
 
   </div>

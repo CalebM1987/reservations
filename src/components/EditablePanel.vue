@@ -8,7 +8,15 @@
       </div>
       <div :id="'panel-' + _uid + '-collapse'" class="panel-collapse collapse">
         <div class="panel-body">
-          <editable-table :items="items" :fields="fields" :item_key="item_key" @on-add="addItem" @on-delete="deleteItem" @on-change="updateItem"></editable-table>
+          <editable-table :items="items"
+                          :fields="fields"
+                          :item_key="item_key"
+                          :action_btn_class="action_btn_class"
+                          :action_btn_help="action_btn_help"
+                          @on-add="addItem"
+                          @on-delete="deleteItem"
+                          @on-change="updateItem">
+          </editable-table>
         </div>
         <div class="panel-footer">
           <button class="btn btn-primary" @click="submitChanges">Save Changes</button>
@@ -35,7 +43,7 @@
 //        editable_items: items.slice(0)
       }
     },
-    props: ['items', 'fields', 'item_key', 'panel_title'],
+    props: ['items', 'fields', 'item_key', 'panel_title', 'action_btn_class', 'action_btn_help'],
     methods: {
       addItem: function(){
         this.$emit('on-add');
